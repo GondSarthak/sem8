@@ -1,54 +1,84 @@
 #include <iostream>
-#include <queue>
 #include <vector>
+#include <queue>
 #include <omp.h>
+
 using namespace std;
-int main()
-{
-    int num_vertices, num_edges, source;
-    cout << "Enter number of vertices, edges, and source node: ";
-    cin >> num_vertices >> num_edges >> source;
-    // Input validation
-    if (source < 1 || source > num_vertices)
-    {
-        cout << "Invalid source node!" << endl;
-        return 1;
-    }
-    vector<vector<int>> adj_list(num_vertices + 1);
-    for (int i = 0; i < num_edges; i++)
-    {
-        int u, v;
-        cin >> u >> v;
-        // Input validation for edges
-        if (u < 1 || u > num_vertices || v < 1 || v > num_vertices)
-        {
-            cout << "Invalid edge: " << u << " " << v << endl;
-            return 1;
-        }
-        adj_list[u].push_back(v);
-        adj_list[v].push_back(u);
-    }
+
+// Define the graph as an adjacency list
+vector<vector<int>> graph;
+
+// Function to perform breadth-first search (BFS)
+vector<int> bfs(int start_node) {
+    int num_nodes = graph.size();
+    vector<bool> visited(num_nodes, false);
+    vector<int> route;
+
+    // Create a queue for BFS
     queue<int> q;
-    vector<bool> visited(num_vertices + 1, false);
-    q.push(source);
-    visited[source] = true;
-    while (!q.empty())
-    {
-        int curr_vertex = q.front();
+
+    // Mark the start node as visited and enqueue it
+    visited[start_node] = true;
+    q.push(start_node);
+
+    while (!q.empty()) {
+        // Dequeue a node from the queue
+        int current_node = q.front();
         q.pop();
-        cout << curr_vertex << " ";
-// Parallel loop for neighbors
-#pragma omp parallel for
-        for (int i = 0; i < adj_list[curr_vertex].size(); i++)
-        {
-            int neighbour = adj_list[curr_vertex][i];
-            if (!visited[neighbour])
-            {
-                visited[neighbour] = true;
-                q.push(neighbour);
+
+        // Add the current node to the route
+        route.push_back(current_node);
+
+        // Visit all the adjacent nodes of the current node
+        for (int neighbor : graph[current_node]) {
+            // If the neighbor is not visited, mark it as visited and enqueue it
+            if (!visited[neighbor]) {
+                visited[neighbor] = true;
+                q.push(neighbor);
             }
         }
     }
+
+    return route;
+}
+
+int main() {
+    // Get the number of nodes in the graph from the user
+    int num_nodes;
+    cout << "Enter the number of nodes in the graph: ";
+    cin >> num_nodes;
+
+    // Resize the graph vector to accommodate the nodes
+    graph.resize(num_nodes);
+
+    // Get the adjacency list representation of the graph from the user
+    for (int i = 0; i < num_nodes; ++i) {
+        int num_neighbors;
+        cout << "Enter the number of neighbors for node " << i << ": ";
+        cin >> num_neighbors;
+
+        cout << "Enter the neighbors of node " << i << ": ";
+        for (int j = 0; j < num_neighbors; ++j) {
+            int neighbor;
+            cin >> neighbor;
+            graph[i].push_back(neighbor);
+        }
+    }
+
+    // Get the starting node for BFS from the user
+    int start_node;
+    cout << "Enter the starting node for BFS: ";
+    cin >> start_node;
+
+    // Perform BFS to find the route
+    vector<int> route = bfs(start_node);
+
+    // Print the route
+    cout << "BFS Route: ";
+    for (int node : route) {
+        cout << node << " ";
+    }
     cout << endl;
+
     return 0;
 }
