@@ -1,7 +1,7 @@
-% % writefile matrix_mult.cu
+%%writefile matrix_mult.cu
 #include <iostream>
 #include <cuda.h>
-    using namespace std;
+using namespace std;
 #define BLOCK_SIZE 1
 __global__ void gpuMM(float *A, float *B, float *C, int N)
 {
