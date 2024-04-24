@@ -1,4 +1,4 @@
-% % writefile add.cu
+%%writefile add.cu
 #include <iostream>
 #include <cstdlib> // Include <cstdlib> for rand()
     using namespace std;
